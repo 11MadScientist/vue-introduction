@@ -5,7 +5,7 @@ used to handle user interactions with your application.
 We can listen to DOM events using the `v-on` directive:
 `<button v-on:click="increment">{{ count }}</button>`
 
-`Due to its frequent use, v-on also has a shorthand syntax :`
+Due to its frequent use, v-on also has a shorthand syntax :
 `<button @click="increment">{{ count }}</button>`
 
 You can put the logic inside the event itself if logic is simple enough
