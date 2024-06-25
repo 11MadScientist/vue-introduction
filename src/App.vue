@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>{{ season.type }}</h1>
+    <h1 :class="seasonColor">{{ season.type }}</h1>
     <button><h3 @click="changeSeason()">Click to change the season</h3></button>
     <h5>Times season changed: {{ count }} </h5>
   </div>
@@ -8,13 +8,18 @@
 </template>
 
 <script setup>
+/**
+ * we are using attribute binding to bind class to seasonColor
+ * the class of the element will now change based on the value of seasonColor
+ * making the style versatile per season.
+ */
+
 import {ref, reactive} from 'vue'
 
-// we use reactive to objects specially those who have deep attributes (nexted attributes)
 const season = reactive({type: "DEFAULT"});
 
-// we use ref on simple items
 const count = ref(0);
+const seasonColor = ref("");
 
 const seasons = [
   "SUMMER",
@@ -23,14 +28,35 @@ const seasons = [
   "SPRING"
 ];
 
+const seasonColors = [
+  "summer-yellow",
+  "fall-orange",
+  "winter-white",
+  "spring-green"
+];
+
 const changeSeason = () => {
-  count.value++;
   let nextSeason = count.value % 4;
+  count.value++;
   season.type = seasons[nextSeason];
+  seasonColor.value = seasonColors[nextSeason];
 };
 
 </script>
 
 <style scoped>
+.summer-yellow {
+  color: #fffa9f;
+}
+.fall-orange {
+  color: #92361a;
+}
 
+.winter-white {
+  color: #f8f8f8;
+}
+
+.spring-green {
+  color: #6c984b;
+}
 </style>

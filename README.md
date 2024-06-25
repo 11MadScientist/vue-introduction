@@ -1,29 +1,18 @@
-# vue-introduction
+Attribute Bindings (Sample in App.vue)
 
-This template should help get you started developing with Vue 3 in Vite.
 
-## Recommended IDE Setup
+In Vue.js, attribute bindings allow you to dynamically bind HTML attributes to data properties in your Vue instance. This is done using the 'v-bind' directive or the shorthand ':'. This enables attributes to change reactively with the data.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Using `v-bind`:
+<img v-bind:src="imageSrc" alt="Dynamic Image">
 
-## Customize configuration
+Using shorthand `:`:
+<img :src="imageSrc" alt="Dynamic Image">
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+In your Vue instance:
+new Vue({
+  el: '#app',
+  data: {
+    imageSrc: 'path/to/image.jpg'
+  }
+});
