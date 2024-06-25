@@ -1,29 +1,18 @@
-# vue-introduction
+Declarative Rendering
 
-This template should help get you started developing with Vue 3 in Vite.
+Declarative rendering in Vue.js refers to the approach where you describe the desired outcome, and the framework handles the DOM manipulation to achieve it. Instead of imperatively coding how the DOM should change in response to data, you simply bind data to the DOM using Vue's template syntax. When the data changes, Vue automatically updates the DOM to reflect these changes. This makes the code cleaner, more readable, and easier to maintain.
 
-## Recommended IDE Setup
+In a Vue template, you might see something like this:
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+<div id="app">
+  <p>{{ message }}</p>
+</div>
 
-## Customize configuration
+And in your Vue instance:
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello, Vue!'
+  }
+});
