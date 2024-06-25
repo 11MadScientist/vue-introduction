@@ -5,10 +5,10 @@ mustache {{}} only works on text interpolation, you can't use the value using mu
 In Vue.js, attribute bindings allow you to dynamically bind HTML attributes to data properties in your Vue instance. This is done using the 'v-bind' directive or the shorthand ':'. This enables attributes to change reactively with the data.
 
 Using `v-bind`:
-<img v-bind:src="imageSrc" alt="Dynamic Image">
+`<img v-bind:src="imageSrc" alt="Dynamic Image">`
 
 Using shorthand `:`:
-<img :src="imageSrc" alt="Dynamic Image">
+`<img :src="imageSrc" alt="Dynamic Image">`
 
 In your Vue instance:
 new Vue({
