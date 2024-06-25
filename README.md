@@ -1,19 +1,16 @@
-Attribute Bindings (Sample in App.vue)
+Event Listeners (sample in App.vue)
 
-mustache {{}} only works on text interpolation, you can't use the value using mustache
+used to handle user interactions with your application. 
 
-In Vue.js, attribute bindings allow you to dynamically bind HTML attributes to data properties in your Vue instance. This is done using the 'v-bind' directive or the shorthand ':'. This enables attributes to change reactively with the data.
+We can listen to DOM events using the `v-on` directive:
+`<button v-on:click="increment">{{ count }}</button>`
 
-Using `v-bind`:
-`<img v-bind:src="imageSrc" alt="Dynamic Image">`
+`Due to its frequent use, v-on also has a shorthand syntax :`
+`<button @click="increment">{{ count }}</button>`
 
-Using shorthand `:`:
-`<img :src="imageSrc" alt="Dynamic Image">`
+You can put the logic inside the event itself if logic is simple enough
+`<button @click="count++">{{ count }}</button>`
 
-In your Vue instance:
-new Vue({
-  el: '#app',
-  data: {
-    imageSrc: 'path/to/image.jpg'
-  }
-});
+or you can create a method in the script section, then append it in the event
+`<button @click="increment">{{ count }}</button>`
+increment is a method, if the method has params, then `increment(val)`
