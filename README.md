@@ -1,18 +1,28 @@
-Declarative Rendering
+<h3>List Rendering</h3>
 
-Declarative rendering in Vue.js refers to the approach where you describe the desired outcome, and the framework handles the DOM manipulation to achieve it. Instead of imperatively coding how the DOM should change in response to data, you simply bind data to the DOM using Vue's template syntax. When the data changes, Vue automatically updates the DOM to reflect these changes. This makes the code cleaner, more readable, and easier to maintain.
+allows you to dynamically render a list of items using the `v-for` directive. This directive is used to iterate over an array or object and render a block of HTML for each item.
 
-In a Vue template, you might see something like this:
+Basic Syntax: 
+```
+<template>
+  <ul>
+    <li v-for="item in items" :key="item.id">
+      {{ item.name }}
+    </li>
+  </ul>
+</template>
 
-<div id="app">
-  <p>{{ message }}</p>
-</div>
-
-And in your Vue instance:
-
-new Vue({
-  el: '#app',
-  data: {
-    message: 'Hello, Vue!'
+<script>
+export default {
+  data() {
+    return {
+      items: [
+        { id: 1, name: 'Item 1' },
+        { id: 2, name: 'Item 2' },
+        { id: 3, name: 'Item 3' }
+      ]
+    };
   }
-});
+};
+</script>
+```

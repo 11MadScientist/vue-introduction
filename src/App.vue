@@ -1,33 +1,40 @@
 <template>
-  <div>
-    <h1>{{ season.type }}</h1>
-    <button><h3 @click="changeSeason()">Click to change the season</h3></button>
-    <h5>Times season changed: {{ count }} </h5>
-  </div>
- 
+  <form @submit.prevent="">
+    <div>
+      <label for="todoTitle">Add New Todo:</label>
+      <input id="todoTitle" v-model="todoTitle" type="text">
+      <button @click="addTodo">Add</button>
+    </div>
+
+    <div>
+      <ol>
+        <li v-for="todo in todoList" :key = todo.id>
+          {{ todo.title }}
+          <button @click="removeTodo(todo.id)">Remove</button>
+        </li>
+      </ol>
+    </div>
+
+  </form>
 </template>
 
 <script setup>
 import {ref, reactive} from 'vue'
 
-// we use reactive to objects specially those who have deep attributes (nexted attributes)
-const season = reactive({type: "DEFAULT"});
+let todoId = 0;
 
-// we use ref on simple items
-const count = ref(0);
+const todoTitle = ref("");
 
-const seasons = [
-  "SUMMER",
-  "FALL",
-  "WINTER",
-  "SPRING"
-];
+const todoList = ref([]);
 
-const changeSeason = () => {
-  count.value++;
-  let nextSeason = count.value % 4;
-  season.type = seasons[nextSeason];
-};
+const addTodo = () => {
+  todoList.value.push({id: todoId++, title: todoTitle.value});
+  todoTitle.value = "";
+}
+
+const removeTodo = (todoId) => {
+  todoList.value = todoList.value.filter(todo => todo.id !== todoId);  
+}
 
 </script>
 
