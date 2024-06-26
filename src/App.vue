@@ -1,62 +1,40 @@
 <template>
   <div>
-    <h1 :class="seasonColor">{{ season.type }}</h1>
-    <button><h3 @click="changeSeason()">Click to change the season</h3></button>
-    <h5>Times season changed: {{ count }} </h5>
+    <div class="container">
+    <h1>Using v-bind and v-on together.</h1>
+    <input type="text" :value="text" @input="onInput">
+    <h3 class="reflect">{{ text }}</h3>
   </div>
- 
+
+  <div class="container">
+    <h1>Using v-model.</h1>
+    <input v-model="vmodeltext">
+    <h3 class="reflect">{{ vmodeltext }}</h3>
+  </div>
+  </div>
 </template>
 
 <script setup>
-/**
- * we are using attribute binding to bind class to seasonColor
- * the class of the element will now change based on the value of seasonColor
- * making the style versatile per season.
- */
 
 import {ref, reactive} from 'vue'
 
-const season = reactive({type: "DEFAULT"});
+const text = ref("");
 
-const count = ref(0);
-const seasonColor = ref("");
+const vmodeltext = ref("");
 
-const seasons = [
-  "SUMMER",
-  "FALL",
-  "WINTER",
-  "SPRING"
-];
-
-const seasonColors = [
-  "summer-yellow",
-  "fall-orange",
-  "winter-white",
-  "spring-green"
-];
-
-const changeSeason = () => {
-  let nextSeason = count.value % 4;
-  count.value++;
-  season.type = seasons[nextSeason];
-  seasonColor.value = seasonColors[nextSeason];
+const onInput = (e) => {
+  text.value = e.target.value
 };
+
 
 </script>
 
 <style scoped>
-.summer-yellow {
-  color: #fffa9f;
-}
-.fall-orange {
-  color: #92361a;
+.reflect {
+  color: white;
 }
 
-.winter-white {
-  color: #f8f8f8;
-}
-
-.spring-green {
-  color: #6c984b;
+.container {
+  display: block;
 }
 </style>

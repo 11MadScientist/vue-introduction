@@ -1,16 +1,23 @@
-Event Listeners (sample in App.vue)
+<h1>Form Bindings (Sample in App.vue)</h1>
 
-used to handle user interactions with your application. 
+Using `v-bind` and `v-on` together, we can create two-way bindings on form input elements:
 
-We can listen to DOM events using the `v-on` directive:
-`<button v-on:click="increment">{{ count }}</button>`
+`<input :value="text" @input="onInput">`
+`<h3 class="reflect">{{ vmodeltext }}</h3>`
 
-Due to its frequent use, v-on also has a shorthand syntax :
-`<button @click="increment">{{ count }}</button>`
+`function onInput(e) {
+  text.value = e.target.value
+}`
 
-You can put the logic inside the event itself if logic is simple enough
-`<button @click="count++">{{ count }}</button>`
+as you input the value in textbox, vue will update the h3 text
 
-or you can create a method in the script section, then append it in the event
-`<button @click="increment">{{ count }}</button>`
-increment is a method, if the method has params, then `increment(val)`
+to simplify two way bindings, Vue provides a directive, `v-model`,
+which is essentially syntactic sugar for the above:
+
+`<input v-model="vmodeltext">`
+`<h3 class="reflect">{{ vmodeltext }}</h3>`
+
+`v-model` automatically syncs the `<input>`'s value with the bound state, so we no longer need to use an event handler for that.
+
+`v-model` works not only on text inputs, but also on other input types such as checkboxes, radio buttons, and select dropdowns.
+
