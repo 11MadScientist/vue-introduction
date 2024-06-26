@@ -1,23 +1,28 @@
-<h1>Form Bindings (Sample in App.vue)</h1>
+<h1>Conditional Rendering (Sample in App.vue)</h1>
 
-Using `v-bind` and `v-on` together, we can create two-way bindings on form input elements:
+conditional rendering allows you to display elements based on certain conditions. The primary directives used for this are `v-if`, `v-else-if`, `v-else`, and `v-show`.
 
-`<input :value="text" @input="onInput">`
-`<h3 class="reflect">{{ vmodeltext }}</h3>`
+1. `v-if`: Renders the element if the expression evaluates to true.
+`<div v-if="isVisible">Visible Content</div>`
 
-`function onInput(e) {
-  text.value = e.target.value
-}`
+2. `v-else-if`: Specifies a new condition to check if the previous v-if was false.
+`<div v-if="type === 'A'">Type A</div>`
+`<div v-else-if="type === 'B'">Type B</div>`
 
-as you input the value in textbox, vue will update the h3 text
+3. `v-else`: Renders the element if none of the preceding conditions are true.
+`<div v-if="type === 'A'">Type A</div>`
+`<div v-else-if="type === 'B'">Type B</div>`
+`<div v-else>Other Types</div>`
 
-to simplify two way bindings, Vue provides a directive, `v-model`,
-which is essentially syntactic sugar for the above:
+4. `v-show`: Toggles the element's visibility based on the expression.
+`<div v-show="isVisible">Visible Content</div>`
 
-`<input v-model="vmodeltext">`
-`<h3 class="reflect">{{ vmodeltext }}</h3>`
+<h3>Difference between `v-if` and `v-show`</h3>
 
-`v-model` automatically syncs the `<input>`'s value with the bound state, so we no longer need to use an event handler for that.
++ `v-if`
+- Adds / removes the element from DOM completely, it is enifficient to use if element can appear and disappear in one session, best to use on large sections of the DOM, where you know
+the condition won't be toggled (page won't rerender).
 
-`v-model` works not only on text inputs, but also on other input types such as checkboxes, radio buttons, and select dropdowns.
-
++ `v-show`
+- Toggles the visibility of the element based on the condition. It will just add `display: none`
+style to hide the element without removing it from the DOM, this way it can appear and disappear without needing large amount of computing.
