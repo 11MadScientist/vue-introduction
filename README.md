@@ -1,28 +1,19 @@
-<h1>List Rendering (sample on App.vue)</h1>
+<h1>Computed Property (sample on App.vue)</h1>
 
-allows you to dynamically render a list of items using the `v-for` directive. This directive is used to iterate over an array or object and render a block of HTML for each item.
+Is a reactive property that automatically recompute their values when their dependencies change.
+Computed properties are useful for performing extensive operations only when necessary and for deriving state from other state in a way that is declarative and reactive.
 
-Basic Syntax: 
+Example Syntax:
 ```
-<template>
-  <ul>
-    <li v-for="item in items" :key="item.id">
-      {{ item.name }}
-    </li>
-  </ul>
-</template>
+import { ref, computed } from 'vue'
 
-<script>
-export default {
-  data() {
-    return {
-      items: [
-        { id: 1, name: 'Item 1' },
-        { id: 2, name: 'Item 2' },
-        { id: 3, name: 'Item 3' }
-      ]
-    };
-  }
-};
-</script>
+const hideCompleted = ref(false)
+const todos = ref([
+  /* ... */
+])
+
+const filteredTodos = computed(() => {
+  // return filtered todos based on
+  // `todos.value` & `hideCompleted.value`
+})
 ```
