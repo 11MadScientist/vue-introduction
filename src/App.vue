@@ -1,16 +1,27 @@
 <template>
-  <p ref="pElementRef">Hello World</p>
+  <p>Todo id: {{ todoId }}</p>
+  <button @click="todoId++" :disabled="!todoData">Fetch next todo</button>
+  <p v-if="!todoData">Loading...</p>
+  <pre v-else>{{ todoData }}</pre>
 </template>
 
 <script setup>
-import {ref, reactive, onMounted} from 'vue'
+import {ref, reactive, watch} from 'vue'
 
-const pElementRef = ref();
+const todoId = ref(1);
+const todoData = ref();
 
-onMounted(() => {
-  pElementRef.value.textContent = "Nice to meet you.";
-});
+const fetchData = async() => {
+  todoData.value = null;
+  const res = await fetch(
+    `https://jsonplaceholder.typicode.com/todos/${todoId.value}`
+  );
+  todoData.value = await res.json();
+};
 
+watch(todoId, (newTodoId, oldTodoId) => {
+  fetchData();
+}, {immediate: true});
 </script>
 
 <style scoped>

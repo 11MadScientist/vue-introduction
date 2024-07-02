@@ -1,89 +1,167 @@
-<h1>Lifecycle Hooks and Template Refs (sample on App.vue)</h1>
+<h1>Watchers (sample on App.vue)</h1>
 
-<h3>Lifecycle Hooks</h3>
+`Watchers` are used to perform actions in response to changes in reactive data. They are particularly useful for executing asynchronous operations, complex data transformations, or other side effects when reactive data changes.
 
-`Lifecycle Hooks` allows you to perform actions at specific stages of a component's lifecycle.
-Herea re commonly used lifecycle Hooks:
-1. `onBeforeMount`: Called before the component is mounted.
-2. `onMounted`: Called after the component is mounted.
-3. `onBeforeUpdate`: Called before the component updates.
-4. `onUpdated`: Called after the component updates.
-5. `onBeforeUnmount`: Called before the component is unmounted.
-6. `onUnmounted`: Called after the component is unmounted.
+<h3>Basic Usage of Watchers</h3>
 
-<h3>Template Refs</h3>
-
-`Template Refs` are used to directly access DOM elements or child components in the template.
-You can use `ref` function from the Composition API to create template refs.
-
-Example of using template refs to access a DOM element:
-```
-<template>
-  <div>
-    <input ref="inputRef" placeholder="Type something">
-    <button @click="focusInput">Focus Input</button>
-  </div>
-</template>
-
-<script>
-import { ref, onMounted } from 'vue';
-
-export default {
-  setup() {
-    const inputRef = ref(null);
-
-    const focusInput = () => {
-      if (inputRef.value) {
-        inputRef.value.focus();
-      }
-    };
-
-    onMounted(() => {
-      console.log('Component mounted and inputRef:', inputRef.value);
-    });
-
-    return {
-      inputRef,
-      focusInput,
-    };
-  },
-};
-</script>
-
-```
-
-<h3>Combining Lifecycle Hooks and Template Refs</h3>
-
-You can combine `lifecycle hooks` and `template refs` to perform actions on DOM elements or child components at specific stages of the component's lifecycle. For Example, you might want to set the focus on an input element when the component is mounted.
+You can create a watcher using `watch` function from the composition API. The `watch` function takes two arguements: the reactive data to watch and the callback function to execute when the data changes.
 
 Example:
 ```
 <template>
   <div>
-    <input ref="inputRef" placeholder="Type something">
+    <input v-model="name" placeholder="Enter your name">
+    <p>{{ name }}</p>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 
 export default {
   setup() {
-    const inputRef = ref(null);
+    const name = ref('');
 
-    onMounted(() => {
-      if (inputRef.value) {
-        inputRef.value.focus();
-      }
+    watch(name, (newValue, oldValue) => {
+      console.log(`Name changed from ${oldValue} to ${newValue}`);
     });
 
     return {
-      inputRef,
+      name,
     };
   },
 };
 </script>
+```
+Explaination
+1. Reactive variable: `name` is defined as a reactive variable using `ref`.
+2. Watcher: `watch` function is used to watch changes to `name`. The callback function logs the old and new values whenever `name` changes.
 
+
+<h3>Watching Multiple Sources</h3>
+
+You can watch multiple sources by passing an array of sources to the`watch` function.
+
+Example:
+```
+<template>
+  <div>
+    <input v-model="firstName" placeholder="First Name">
+    <input v-model="lastName" placeholder="Last Name">
+    <p>Full Name: {{ fullName }}</p>
+  </div>
+</template>
+
+<script>
+import { ref, computed, watch } from 'vue';
+
+export default {
+  setup() {
+    const firstName = ref('');
+    const lastName = ref('');
+
+    const fullName = computed(() => {
+      return `${firstName.value} ${lastName.value}`;
+    });
+
+    watch([firstName, lastName], ([newFirstName, newLastName], [oldFirstName, oldLastName]) => {
+      console.log(`First Name changed from ${oldFirstName} to ${newFirstName}`);
+      console.log(`Last Name changed from ${oldLastName} to ${newLastName}`);
+    });
+
+    return {
+      firstName,
+      lastName,
+      fullName,
+    };
+  },
+};
+</script>
 ```
 
-By using `lifecycle hooks` and `template refs`, you can manage the component's lifecycle and interact with the DOM more effectively.
+Explanation
+1. Reactive Variables: `firstName` and `lastName` are defined as reactive variables using ref.
+2. Computed Property: `fullName` is defined as a computed property that concatenates `firstName` and `lastName`.
+3. Watcher: The `watch` function is used to watch changes to both `firstName` and `lastName`.The callback function logs the old and new values for each.
+
+<h3>Deep Watchers</h3>
+
+By default, `watch` only watches the reference itself, not the nested properties. To watch for changes inside an object or array, you need to use `deep` option.
+
+Example:
+```
+<template>
+  <div>
+    <input v-model="user.name" placeholder="Name">
+    <input v-model="user.age" placeholder="Age">
+    <p>Name: {{ user.name }}</p>
+    <p>Age: {{ user.age }}</p>
+  </div>
+</template>
+
+<script>
+import { ref, watch } from 'vue';
+
+export default {
+  setup() {
+    const user = ref({
+      name: '',
+      age: ''
+    });
+
+    watch(user, (newValue, oldValue) => {
+      console.log(`User changed from`, oldValue, `to`, newValue);
+    }, { deep: true });
+
+    return {
+      user,
+    };
+  },
+};
+</script>
+```
+
+Explaination
+1. Reactive Object: `user` is defined as a reactive object using `ref`.
+2. Deep Watcher: the `watch` function is used with the `deep` option set to `true` to watch changes inside the `user` object. The callback function logs the old and new values whenever any property inside the`user` changes.
+
+<h3>Immediate Watchers</h3>
+
+The `watch` function also provides an `immediate` option, which triggers the callback immediately when the watcher is created.
+
+Example:
+```
+<template>
+  <div>
+    <p>{{ message }}</p>
+  </div>
+</template>
+
+<script>
+import { ref, watch } from 'vue';
+
+export default {
+  setup() {
+    const message = ref('Hello, Vue 3!');
+
+    watch(message, (newValue, oldValue) => {
+      console.log(`Message changed from ${oldValue} to ${newValue}`);
+    }, { immediate: true });
+
+    return {
+      message,
+    };
+  },
+};
+</script>
+```
+
+Explaination:
+1. Reactive Variable: `message` is defined as a reactive variable using `ref`.
+2. Immediate watcher: `watch` function is used with the `immediate` option to set to `true` to trigger the callback immediately when the watcher is created.
+
+Summary
+- `Basic Watcher` perform actions in repsonse to changes in reactive data.
+- `Mulitple Sources` watch multiple reactive data sources by passing an array.
+- `Deep Watcher` uses the `deep` option to watch for changes inside an object or array.
+- `Immediate Watcher` uses the `immediate` option to trigger the callback immediately when watcher is created.
