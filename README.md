@@ -33,7 +33,7 @@ export default {
 };
 </script>
 ```
-Explaination
+Explanation
 1. Reactive variable: `name` is defined as a reactive variable using `ref`.
 2. Watcher: `watch` function is used to watch changes to `name`. The callback function logs the old and new values whenever `name` changes.
 
@@ -121,7 +121,7 @@ export default {
 </script>
 ```
 
-Explaination
+Explanation
 1. Reactive Object: `user` is defined as a reactive object using `ref`.
 2. Deep Watcher: the `watch` function is used with the `deep` option set to `true` to watch changes inside the `user` object. The callback function logs the old and new values whenever any property inside the`user` changes.
 
