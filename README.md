@@ -1,68 +1,22 @@
-<h1>Props (sample on App.vue)</h1>
+<h1>Emits (sample on App.vue)</h1>
 
-`Props` are a way to pass data from a parent component to a child component. Props are short for `"properties", and they allow you to customize and configure child components by passing data down from the parent.
+`emits` are used to create custom events that a child component can emit to notify its parent component about certain actions or changes. This allows the parent component to react to these events accordingly.
 
-<h3>Defining Props in the Child Component</h3>
+The first arguement of `emit()` is the event name. Any additional arguements are passed on th event listener.
 
-First, you need to define the props in the child Component. You can do this using the `props` option in the component's setup function or as part of the component's option object.
-ex:
-```
-<template>
-  <h2>{{ title }}</h2>
-  <h2>{{ msg || 'No props passed yet' }}</h2>
-</template>
-<script setup>
-const props = defineProps({
-  msg: String
-})
-</script>
-```
+The parent can listen to chile emitted events using `v-on`, here the handler receives the extra agruement from the child emit call and assigns it to local state
 
-Note: `defineProps()` is a compile-time macro and doesn't need to be imported. Once declared, the msg prop can be used in the child component's template. It can also be accessed in Javascript via the returned object of `defineProps()`.
-
-<h3>Passing Props from the Parent Component</h3>
-
-In the parent component, you can pass props to the child component by adding attributes to the child componenet's tag and binding them to the parent component's data
-ex:
-```
-<template>
-  <ChildComponent title="This is Title" :msg="msg"/>
-</template>
-<script setup>
-  import ChildComponent from './components/icons/Component1.vue';
-  const msg = "Message from parent passed to child";
-</script>
-```
-Note: to pass a dynamic value, we can use the `v-bind` syntax (`:msg="msg"`)
-
-<h3>Prop Validation</h3>
-
-Vue allows you to specify prop validation by defining the expected type of the prop and whether it is required
-
-ex:
+Child side:
 ```
 <script setup>
-const props = defineProps({
-  msg: {
-    type: String,
-    required: true
-  }
-});
+// declare emitted events
+const emit = defineEmits(['response'])
+
+// emit with argument
+emit('response', 'hello from child')
 </script>
 ```
-
-<h3>Default Prop Values</h3>
-
-You can specify the default value for props that are not required.
-ex:
+Parent side:
 ```
-<script setup>
-const props = defineProps({
-  msg: {
-    type: String,
-    required: false,
-    default: "Hello there, I'm not required"
-  }
-});
-</script>
+<ChildComp @response="(msg) => childMsg = msg" />
 ```

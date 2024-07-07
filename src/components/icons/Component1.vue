@@ -1,26 +1,21 @@
 <template>
   <div>
-    {{ title }}
-    <br>
-    {{ msg }}
-    <br>
-    {{ notRequiredProp }}
+   <button @click="clickHandler">Click Me</button>
   </div>
 </template>
 
 <script setup>
-const props = defineProps({
-  title: String,
-  msg: {
-    type: String,
-    required: true
-  },
-  notRequiredProp: {
-    type: String,
-    required: false,
-    default: "Hello there, I'm not required, so I have a default value."
-  }
+import {ref} from 'vue';
+//defines the emits that the child can do
+const emits = defineEmits([
+  'click-response'
+]);
 
-});
+const inc = ref(0);
+
+const clickHandler = () => {
+  // emits the `click-response` which will now inform the parent
+  emits('click-response', `clicked the child component button ${inc.value++} times`);
+}
 
 </script>
