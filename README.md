@@ -1,4 +1,4 @@
-<h1>Template Syntax<h1>
+<h1>Template Syntax</h1>
 
 Vue uses an HTML-based template syntax that allows you to declaratively bind the rendered DOM to the underlying component instance's data. All Vue templates are syntactically valid HTML that can be parased by spec-compliant browsers and HTML parasers.
 
