@@ -1,4 +1,4 @@
-Event Listeners (sample in App.vue)
+<h1>Event Listeners (sample in App.vue)</h1>
 
 used to handle user interactions with your application. 
 
