@@ -1,8 +1,8 @@
 <template>
   <div>
     <h1 :class="seasonColor">{{ season.type }}</h1>
-    <button><h3 @click="changeSeason()">Click to change the season</h3></button>
-    <h5>Times season changed: {{ count }} </h5>
+    <button :id :disabled="isButtondisabled"><h3 @click="changeSeason()">Click to change the season</h3></button>
+    <h5 v-bind="objectOfAttrs">Times season changed: {{ count }} </h5>
   </div>
  
 </template>
@@ -17,9 +17,21 @@
 import {ref, reactive} from 'vue'
 
 const season = reactive({type: "DEFAULT"});
-
 const count = ref(0);
 const seasonColor = ref("");
+
+// same name shorthand
+const id = ref("buttonId");
+
+// boolean attributes
+const isButtondisabled = ref(true);
+
+// Dynamically binding multiple attributes
+const objectOfAttrs = {
+  id: 'container',
+  class: 'wrapper',
+  style: 'background-color:green'
+}
 
 const seasons = [
   "SUMMER",
