@@ -50,3 +50,82 @@ Therefore, the following will NOT work:
 <!-- flow control won't work either, use ternary expressions -->
 {{ if (ok) { return message } }}
 ```
+
+<h3> Directives </h3>
+
+Directives are special attributes with the `v-` prefix. Vue provides a number of built-in directives, including `v-html` and `v-bind`.
+
+Directive attribute values are expected to be single Javascript Expressions (with exception of `v-for`, `v-on`, and `v-slot`). A directive's job is to reactively apply updates to the DOM when the value of its expression changes. Take `v-if` as an example:
+`<p v-if="seen">Now you see me</p>`
+Here, the v-if directive would remove / insert the <p> element based on the truthiness of the value of the expression seen.
+
+<h3>Arguments</h3>
+
+Some directives can take an "argument", denoted by a colon after the directive name. For example, the `v-bind` directive is used to reactively update an HTML attribute:
+```
+<a v-bind:href="url"> ... </a>
+
+<!-- shorthand -->
+<a :href="url"> ... </a>
+```
+Here, href is the argument, which tells the v-bind directive to bind the element's href attribute to the value of the expression url. In the shorthand, everything before the argument (i.e., v-bind:) is condensed into a single character, :.
+
+Another example is the `v-on` directive, which listens to DOM events:
+```
+<a v-on:click="doSomething"> ... </a>
+
+<!-- shorthand -->
+<a @click="doSomething"> ... </a>
+```
+
+<h3> Dynamic Arguments </h3>
+It is also possible to use a Javascript expresssion in a directive argument by wrapping it with a square brackets:
+```
+<!--
+Note that there are some constraints to the argument expression,
+as explained in the "Dynamic Argument Value Constraints" and "Dynamic Argument Syntax Constraints" sections below.
+-->
+<a v-bind:[attributeName]="url"> ... </a>
+
+<!-- shorthand -->
+<a :[attributeName]="url"> ... </a>
+```
+
+Here, attributeName will be dynamically evaluated as a Javascript expression, and its evaluated value will be used as the final value for the argument. For example, if your component instance has a data property, attributeName, whose value is "href", then this binding will be equivalent to `v-bind:href`.
+
+Similarly, you can use dynamic arguments to bind a handler to a dynamic event name:
+```
+<a v-on:[eventName]="doSomething"> ... </a>
+
+<!-- shorthand -->
+<a @[eventName]="doSomething"> ... </a>
+```
+
+In this example, when `eventName`'s value is `"focus"`, `v-on:[eventName]` will be equivalet to `v-on:focus`.
+
+<h3>Dynamic Argument Value Constraints</h3>
+
+Dynamic arguments are expected to evaluate a string, with the exception of `null`. the special value `null` can be used to explicitly remove the binding. Any other non-string value will trigger a warning.
+
+<h3>Dynamic Argument Syntax Constraints</h3>
+Dynamic argumet expressions have some syntax constraints because certain characters, such as spaces and quotes, are invalid inside HTML attribute names. For example, the following is invalid:
+
+```
+<!-- This will trigger a compiler warning. -->
+<a :['foo' + bar]="value"> ... </a>
+```
+If you need to pass a complex dynamic argument, it's probably better to use a computed property.
+
+When using in-DOM templates (templates directly written in an HTML file), you should also avoid naming keys with uppercase characters, as browsers will coerce attribute names into lowercase:
+
+```
+<a :[someAttr]="value"> ... </a>
+```
+
+The above will be converted to :[someattr] in in-DOM templates. If your comopnent has a `someAttr` property instead of `someattr`, your code won't work. Templates inside Single-File Components are not subject to this constraint.
+
+<h3>Modifiers</h3>
+
+Modifiers are special postfixes denoted by dot, which indicate that a directive should be bound  in some special way. For example, the `.prevent` modifier tells the `v-on` directive to call `event.preventDefault()` on the triggered event:
+
+`<form @submit.prevent="onSubmit">...</form>`
