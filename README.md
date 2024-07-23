@@ -40,6 +40,7 @@ In Vue templates, Javascript expressions can be used in the following positions:
 - In the attribute value of any Vue directives (special attributes that starts with `v-`)
 
 <h3>Expressions Only</h3>
+
 Each binding can only contain one single expression. An expression is a piece of code that can be evaluated to a value. A simple check is whether it can be used after return.
 
 Therefore, the following will NOT work:
@@ -79,6 +80,7 @@ Another example is the `v-on` directive, which listens to DOM events:
 ```
 
 <h3> Dynamic Arguments </h3>
+
 It is also possible to use a Javascript expresssion in a directive argument by wrapping it with a square brackets:
 ```
 <!--
