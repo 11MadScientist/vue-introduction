@@ -1,18 +1,21 @@
-Declarative Rendering
+<h1>Template Syntax<h1>
 
-Declarative rendering in Vue.js refers to the approach where you describe the desired outcome, and the framework handles the DOM manipulation to achieve it. Instead of imperatively coding how the DOM should change in response to data, you simply bind data to the DOM using Vue's template syntax. When the data changes, Vue automatically updates the DOM to reflect these changes. This makes the code cleaner, more readable, and easier to maintain.
+Vue uses an HTML-based template syntax that allows you to declaratively bind the rendered DOM to the underlying component instance's data. All Vue templates are syntactically valid HTML that can be parased by spec-compliant browsers and HTML parasers.
 
-In a Vue template, you might see something like this:
+Under the hood, Vue compiles the templates into highly-optimized Javascript code. Combined with the reactivity system, Vue can intelligently figure out the minimal number of components to re-render and apply the minimal amount of DOM manipulations when the app state changes.
 
-<div id="app">
-  <p>{{ message }}</p>
-</div>
+<h3>Text Interpolation</h3>
 
-And in your Vue instance:
+The most basic form of data binding is text interpolation using the "Mustache" syntax
 
-new Vue({
-  el: '#app',
-  data: {
-    message: 'Hello, Vue!'
-  }
-});
+`<span>Message: {{msg}}</span>`
+The mustache tag will be replaced with the value of the msg proeprty from the corresponding component instance. It will also be updated whenever the msg property changes
+
+<h3>Raw HTML</h3>
+
+The double mustaches interpret the data as plain text, not HTML. In order to output real HTML, you will need to use the `v-html` directive:
+`<p>Using v-html directive: <span v-html="rawHtml"></span></p>`
+where value of rawHtml is:
+`const rawHtml = ref("<span style='color:red'>John Doe</span>");`
+
+the contents of `span` will be replaced with the value of the `rawHtml` property, interpreted as plain HTML - data bindings are ignored. Note that you cannot use v-html to compose template partials, because vue is not a string based templating engine. Instead, components are preferred as the fundamental unit for UI reuse and composition.

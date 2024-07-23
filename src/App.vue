@@ -1,36 +1,33 @@
 <template>
-  <div>
-    <h1>{{ season.type }}</h1>
-    <button><h3 @click="changeSeason()">Click to change the season</h3></button>
-    <h5>Times season changed: {{ count }} </h5>
+  <div class="parent-container">
+    <div class="container">
+      <!--Text Interpolation-->
+      <h1>Using text interpolation: <span>{{ name }}</span></h1>
+    </div>
+    <br>
+    <div class="container">
+      <!--Raw HTML-->
+      <h1>Using v-html directive: <span v-html="name"></span></h1>
+    </div>
   </div>
- 
+
 </template>
 
 <script setup>
-import {ref, reactive} from 'vue'
+import { ref, reactive } from 'vue'
 
-// we use reactive to objects specially those who have deep attributes (nexted attributes)
-const season = reactive({type: "DEFAULT"});
-
-// we use ref on simple items
-const count = ref(0);
-
-const seasons = [
-  "SUMMER",
-  "FALL",
-  "WINTER",
-  "SPRING"
-];
-
-const changeSeason = () => {
-  count.value++;
-  let nextSeason = count.value % 4;
-  season.type = seasons[nextSeason];
-};
-
+const name = ref("<span style='color:red'>John Doe</span>");
 </script>
 
 <style scoped>
+.parent-container {
+  width: 1000px;
+  display: flex;
+  flex-direction: column;
+}
 
+.container {
+  display: block;
+  width: 100%;
+}
 </style>
