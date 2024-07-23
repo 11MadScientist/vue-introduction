@@ -19,3 +19,34 @@ where value of rawHtml is:
 `const rawHtml = ref("<span style='color:red'>John Doe</span>");`
 
 the contents of `span` will be replaced with the value of the `rawHtml` property, interpreted as plain HTML - data bindings are ignored. Note that you cannot use v-html to compose template partials, because vue is not a string based templating engine. Instead, components are preferred as the fundamental unit for UI reuse and composition.
+
+<h3>Using Javascript Expressions</h3>
+
+Vue supports the full power of Javascript expressions inside all data bindings:
+
+```
+{{ number + 1 }}
+
+{{ ok ? 'YES' : 'NO' }}
+
+{{ message.split('').reverse().join('') }}
+
+<div :id="`list-${id}`"></div>
+```
+These expressions will be evaluated as Javascript in the data scope of the current component instance.
+
+In Vue templates, Javascript expressions can be used in the following positions:
+- Inside text Interpolation (mustaches)
+- In the attribute value of any Vue directives (special attributes that starts with `v-`)
+
+<h3>Expressions Only</h3>
+Each binding can only contain one single expression. An expression is a piece of code that can be evaluated to a value. A simple check is whether it can be used after return.
+
+Therefore, the following will NOT work:
+```
+<!-- this is a statement, not an expression: -->
+{{ var a = 1 }}
+
+<!-- flow control won't work either, use ternary expressions -->
+{{ if (ok) { return message } }}
+```
