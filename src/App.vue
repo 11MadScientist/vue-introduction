@@ -1,29 +1,20 @@
 <template>
   <div class="parent-container">
-    <div :class="className">
-      <!--Text Interpolation-->
-      <h1>Using text interpolation: <span>{{ name }}</span></h1>
-    </div>
-    <br>
-    <!--this will be equivalent to :class since attName = "class"-->
-    <div :[attName]="className">
-      <!--Raw HTML-->
-      <h1>Using v-html directive: <span v-html="name"></span></h1>
-    </div>
+    <p @click="increment">{{ obj.id}}</p>
   </div>
 
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, nextTick } from 'vue'
+const obj = {id: ref(1)};
 
-const name = ref("<span style='color:red'>John Doe</span>");
+async function increment() {
+  obj.id.value++;
+  await nextTick();
+  console.log("DOM is now updated");
+}
 
-// dynamic argument
-const attName = ref("class");
-
-// dynamic class name
-const className = ref("container");
 </script>
 
 <style scoped>
