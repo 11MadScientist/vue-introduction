@@ -19,10 +19,16 @@ conditional rendering allows you to display elements based on certain conditions
 
 <h3>Difference between `v-if` and `v-show`</h3>
 
-+ `v-if`
+`v-if`
 - Adds / removes the element from DOM completely, it is enifficient to use if element can appear and disappear in one session, best to use on large sections of the DOM, where you know
 the condition won't be toggled (page won't rerender).
 
-+ `v-show`
+`v-show`
 - Toggles the visibility of the element based on the condition. It will just add `display: none`
 style to hide the element without removing it from the DOM, this way it can appear and disappear without needing large amount of computing.
+
+- does not work with v-else, does not support usage in `<template>`
+
+<h3>v-if with v-for</h3>
+
+When `v-if` and `v-for` are both used on the same element, `v-if` will be evaluated first.
