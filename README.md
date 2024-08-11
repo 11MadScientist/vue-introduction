@@ -232,3 +232,36 @@ You can provide an array of multiple (prefixed) values to a style property, for 
 ```
 
 This will only render the last value in the array which the browser supports. In this example, it will render `display: flex` for browsers that support the unprefixed version of flexbox.
+
+<h3>Binding each key automatically</h3>
+
+Assume you have a `file` object in Vue component:
+```
+export default {
+  data() {
+    return {
+      file: {
+        src: 'https://example.com/image.png',
+        alt: 'Example Image',
+        width: '200',
+        height: '200'
+      }
+    };
+  }
+};
+
+```
+
+You can bind this object to a tag ex: `img` (it can also be a component) using `v-bind`:
+```
+<template>
+  <img v-bind="file">
+</template>
+```
+
+The above is equivalent to writing:
+```
+<img src="https://example.com/image.png" alt="Example Image" width="200" height="200">
+```
+
+Vue automatically binds each key in the`file` object to the corresponding attribute in the `img`.
