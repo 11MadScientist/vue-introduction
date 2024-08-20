@@ -36,6 +36,10 @@ setTimeout(() => {
 Do note this doesn't mean that the call must be placed lexically inside `setup()` or `<script setup>`. `onMounted()` can be called in an external function as long as the call stack is synchronous and originates from within `setup()`.
 
 
+
+
+
+
 <h3>Template Refs</h3>
 
 While Vue's declarative rendering model abstracts away most of the direct DOM operations for you, there may still be cases where we need direct access to the underlying DOM elements. To achieve this, we can use the special `ref` attribute:
@@ -165,6 +169,11 @@ defineExpose({
 </script>
 ```
 When a parent gets an instance of this component via template refs, the retrieved instance will be of the shape `{a:number, b:number}` (refs are automatically unwrapped just like normal instances).
+
+
+
+
+
 
 <h3>Combining Lifecycle Hooks and Template Refs</h3>
 
