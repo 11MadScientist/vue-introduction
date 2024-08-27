@@ -2,7 +2,9 @@
   <h1>{{ childMsg || "No message from child yet" }}</h1>
   <br>
   <!-- uses the `v-on` with the emit name to listen to it-->
-  <Component1 @click-response="(msg) => {childResponse(msg)}"/>
+  <Component1 
+    @click-response="(msg) => {childResponse(msg)}" 
+    @click-response-2="(msg) => {childResponse(msg)}"/>
 </template>
 
 <script setup>
