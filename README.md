@@ -1,146 +1,219 @@
-<h1>Component Events [Emits] (sample on App.vue)</h1>
+<h1>Component v-model (sample on App.vue)</h1>
 
-<h3>Emitting and listenting to Events</h3>
+<h3>Basic Usage</h3>
 
-A component can emit custom events directly in template expresssions (e.g. in a `v-on` handler) using the built-in `$emit` method:
-```
-<!-- MyComponent -->
-<button @click="$emit('someEvent')">Click Me</button>
-```
+`v-model` can be used on a component to implement two-way binding.
 
-The parent can then listent to it using `v-on`:
+Starting in Vue 3.4, the recommended approach to achieve this is using the `defineModel()` macro:
 ```
-<MyComponent @some-event="callback" />
-```
+<!-- Child.vue -->
+<script setup>
+const model = defineModel()
 
-the `.once` modifier is also supported on component event listeners:
-```
-<MyComponent @some-event.once="callback" />
-```
-
-Like components and props, event names provide an automatic case transformation. Notice we emitted a camelCase event, but can listen for it using a kebab-cased listener in the parent. As with props casing, we recommend using kebab-cased event listeners in templates.
-
-Tip: Unlike native DOM events, component emitted events do not bubble. You can only listen to the events emitted by a direct child component. If there is a need to communicate between sibling or deeply nested components, use an external bus or a global state management solution.
-
-<br><br><h3>Event Arguments</h3>
-
-It's sometimes useful to emit a specific value with an event. For example, we may want the `<BlogPost>` component to be in charge of how much to enlarge the text by. In those cases, we can pass extra arguments to `$emit` to provide this value:
-```
-<button @click="$emit('increaseBy', 1)">
-  Increase by 1
-</button>
-```
-
-Then, we listen to the event in the parent, we can use an inline arrow function as the listener, which allows us to access the event argument:
-```
-<MyButton @increase-by="(n) => count += n" />
-```
-
-Or, if the event handler is a method:
-```
-<MyButton @increase-by="increaseCount" />
-```
-
-Then the value will be passed as the first parameter of that method:
-```
-function increaseCount(n) {
-  count.value += n
+function update() {
+  model.value++
 }
+</script>
+
+<template>
+  <div>Parent bound v-model is: {{ model }}</div>
+  <button @click="update">Increment</button>
+</template>
 ```
 
-Tip: All extra arguments passed to `$emit()` after the event name will be forwarded to the listener. For example, with `$emit('foo', 1, 2, 3)` the listener function will receive three arguments.
+the parent can then bind a value with `v-model`:
+```
+<!-- Parent.vue -->
+<Child v-model="countModel" />
+```
 
+The value returned `defineModel()` is a ref. It can be accessed and mutated like any other ref, except that it acts as a two-way binding between a parent value and a local one:
+- Its `.value` is synced with the value bound by the parent `v-model`;
+- When it is mutated by the child, it causes the parent bound value to be updated as well.
 
-<br><br><h3>Declaring Emitted Events</h3>
-
-A component can explicitly declare the events it will emit using the `defineEmits()` macro:
+This means you can also bind this ref to a native input element with `v-model`, making it straightforward to wrap native input elements while providing the same `v-model` usage:
 ```
 <script setup>
-defineEmits(['inFocus', 'submit'])
+const model = defineModel()
 </script>
+
+<template>
+  <input v-model="model" />
+</template>
 ```
 
-The `$emit` method that we used in the `<template>` isn't accessible within the `<script setup>` section of a compnonent, but `defineEmits()` returns an equivalent function that we can use instead:
+<h3>Under the Hood</h3>
+
+`defineModel` is a convenience macro. The compiler expands it to the following:
+- A prop named `modelValue`, which the local ref's value is synced with;
+- An event named `update:modelValue`, which is emitted when the local ref's value is mutated.
+
+This is how you would implement the same child component shown above prior to 3.4:
+```
+<!-- Child.vue -->
+<script setup>
+const props = defineProps(['modelValue'])
+const emit = defineEmits(['update:modelValue'])
+</script>
+
+<template>
+  <input
+    :value="modelValue"
+    @input="emit('update:modelValue', $event.target.value)"
+  />
+</template>
+```
+
+Then, `v-model="foo"` in the parent component will be compiled to:
+```
+<!-- Parent.vue -->
+<Child
+  :modelValue="foo"
+  @update:modelValue="$event => (foo = $event)"
+/>
+```
+
+As you can see, it is quite a bit more verbose. However, it is helpful to understand what is happening under the hood.
+
+Because `defineModel` declares a prop, you can therefore declare the underlying prop's options by passing it to `defineModel`:
+```
+// making the v-model required
+const model = defineModel({ required: true })
+
+// providing a default value
+const model = defineModel({ default: 0 })
+```
+
+Warning: If you have a `default` value for `defineModel` prop and you don't provide any value for this prop from the parent component, it can cause a de-synchronization between parent and child components. In the example below, the parent's `myRef` is undefined, but the child's `model` is 1:
+```
+// child component:
+const model = defineModel({ default: 1 })
+
+// parent component:
+const myRef = ref()
+```
+```
+<Child v-model="myRef"></Child>
+```
+
+<h3>
+
+`v-model` arguments
+
+</h3>
+
+`v-model` on a component can also accept an argument:
+```
+<MyComponent v-model:title="bookTitle" />
+```
+
+In the child component, we can support the corresponding argument by passing a string to `defineModel()` as its first argument:
+```
+<!-- MyComponent.vue -->
+<script setup>
+const title = defineModel('title')
+</script>
+
+<template>
+  <input type="text" v-model="title" />
+</template>
+```
+
+If prop options are also needed, they should be passed after the model name:
+```
+const title = defineModel('title', { required: true })
+```
+
+<h3>
+
+Multiple `v-model` bindings
+
+</h3>
+
+By leveraging the ability to target a particular prop and event as we learned before with `v-model` arguments, we can now create multiple `v-model` bindings on a single component instance.
+
+Each `v-model` will sync to a different prop, without the need for extra options in the component:
+```
+<UserName
+  v-model:first-name="first"
+  v-model:last-name="last"
+/>
+```
 ```
 <script setup>
-const emit = defineEmits(['inFocus', 'submit'])
-
-function buttonClick() {
-  emit('submit')
-}
+const firstName = defineModel('firstName')
+const lastName = defineModel('lastName')
 </script>
+
+<template>
+  <input type="text" v-model="firstName" />
+  <input type="text" v-model="lastName" />
+</template>
 ```
 
-The `defineEmits()` macro cannot be used inside a function, it must be placed directly within the `<script setup>`, as in the example above.
+<h3>
 
-If you're using an explicit `setup` function instead of `<script setup>`, events should be declared using the `emits` option, and the `emit` function is exposed on the `setup()` context:
-```
-export default {
-  emits: ['inFocus', 'submit'],
-  setup(props, ctx) {
-    ctx.emit('submit')
-  }
-}
-```
+Handling `v-model` modifiers
 
-As with other properties of the `setup()` context, `emit` can safely be destructured:
+</h3>
+
+When we were learning about form input bindings, we saw that `v-model` has built-in modifiers - `.trim`, `.number` and `.lazy`. In some cases, you might also want the `v-model` on your custom input component to support custom modifiers.
+
+Let's create an example custom modifier, `capitalize`, that capitalizes the first letter of the string provided by the `v-model` binding:
 ```
-export default {
-  emits: ['inFocus', 'submit'],
-  setup(props, { emit }) {
-    emit('submit')
-  }
-}
+<MyComponent v-model.capitalize="myText" />
 ```
 
-The `emits` option and `defineEmits()` macro also support an object syntax. If using TypeScript you can type arguments, which allows us to perform runtime validation of the payload of the emitted events:
-```
-<script setup lang="ts">
-const emit = defineEmits({
-  submit(payload: { email: string, password: string }) {
-    // return `true` or `false` to indicate
-    // validation pass / fail
-  }
-})
-</script>
-```
-
-If you are using TypeScript with `<script setup>`, it's also possible to declare emitted events using pure type annotations:
-```
-<script setup lang="ts">
-const emit = defineEmits<{
-  (e: 'change', id: number): void
-  (e: 'update', value: string): void
-}>()
-</script>
-```
-
-Although optional, it is recommended to define all emitted events in order to better document how a component should work. It also allows Vue to exclude known listeners from `fallthrough attributes`, avoiding edge cases caused by DOM events manually dispatched by 3rd party code.
-
-<br><br><h3>Events Validation</h3>
-
-Similar to prop type validation, an emitted event can be validated if it is defined with the object syntax instead of the array syntax.
-
-To add validation, the event is assigned a function that receives the arguments passed to the `emit` call and returns a boolean to indicate whether the event is valid or not.
+Modifiers added to a component `v-model` can be accessed in the child component by destructuring the `defineModel()` return value like this:
 ```
 <script setup>
-const emit = defineEmits({
-  // No validation
-  click: null,
+const [model, modifiers] = defineModel()
 
-  // Validate submit event
-  submit: ({ email, password }) => {
-    if (email && password) {
-      return true
-    } else {
-      console.warn('Invalid submit event payload!')
-      return false
+console.log(modifiers) // { capitalize: true }
+</script>
+
+<template>
+  <input type="text" v-model="model" />
+</template>
+```
+
+To conditionally adjust how the value should be read / written based on modifiers, we can pass `get` and `set` options to `defineModel()`. These two options receive the value on get / set of the model ref and should return a transformed value. This is how we can use the `set` option to implement the `capitalize` modifier:
+```
+<script setup>
+const [model, modifiers] = defineModel({
+  set(value) {
+    if (modifiers.capitalize) {
+      return value.charAt(0).toUpperCase() + value.slice(1)
     }
+    return value
   }
 })
+</script>
 
-function submitForm(email, password) {
-  emit('submit', { email, password })
-}
+<template>
+  <input type="text" v-model="model" />
+</template>
+```
+
+<h3>
+
+Modifiers for `v-model` with arguments
+
+</h3>
+
+Here's another example of using modifiers with multiple `v-model` with different arguments:
+```
+<UserName
+  v-model:first-name.capitalize="first"
+  v-model:last-name.uppercase="last"
+/>
+```
+```
+<script setup>
+const [firstName, firstNameModifiers] = defineModel('firstName')
+const [lastName, lastNameModifiers] = defineModel('lastName')
+
+console.log(firstNameModifiers) // { capitalize: true }
+console.log(lastNameModifiers) // { uppercase: true }
 </script>
 ```

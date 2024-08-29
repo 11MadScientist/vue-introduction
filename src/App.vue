@@ -1,22 +1,22 @@
 <template>
-  <h1>{{ childMsg || "No message from child yet" }}</h1>
-  <br>
-  <!-- uses the `v-on` with the emit name to listen to it-->
-  <Component1 
-    @click-response="(msg) => {childResponse(msg)}" 
-    @click-response-2="(msg) => {childResponse(msg)}"/>
+  <div>
+    <h1>First Name: {{ first }}</h1>
+    <h1>Last Name: {{ last }}</h1>
+
+    <Component1 
+      v-model:first-name.uppercase="first" 
+      v-model:last-name.uppercase="last" 
+    />
+  </div>
+  
 </template>
 
 <script setup>
-import {ref} from 'vue';
+import { ref } from 'vue';
 import Component1 from './components/icons/Component1.vue';
 
-const childMsg = ref(null);
-
-const childResponse = (msg) => {
-  childMsg.value = msg;
-};
+const first = ref("FIRST");
+const last = ref("LAST");
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
