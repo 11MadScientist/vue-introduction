@@ -1,219 +1,159 @@
-<h1>Component v-model (sample on App.vue)</h1>
+<h1>Fallthrough Attributes (sample on App.vue)</h1>
 
-<h3>Basic Usage</h3>
+<h3>Attribute Inheritance</h3>
 
-`v-model` can be used on a component to implement two-way binding.
+A "fallthrough attribute" is an attribute or `v-on` event listener that is passed to a component, but is not explicitly declared in the receiving component's `props` or `emits`.
+Common examples of this include `class`, `style`, and `id` attributes.
 
-Starting in Vue 3.4, the recommended approach to achieve this is using the `defineModel()` macro:
+When a component renders a single root element, fallthrough attributes will be automatically added to the root element's attributes. For example, given a `<MyButton>` component with the following template:
 ```
-<!-- Child.vue -->
-<script setup>
-const model = defineModel()
-
-function update() {
-  model.value++
-}
-</script>
-
-<template>
-  <div>Parent bound v-model is: {{ model }}</div>
-  <button @click="update">Increment</button>
-</template>
+<!-- template of <MyButton> -->
+<button>Click Me</button>
 ```
 
-the parent can then bind a value with `v-model`:
+And a parent using this component with:
 ```
-<!-- Parent.vue -->
-<Child v-model="countModel" />
-```
-
-The value returned `defineModel()` is a ref. It can be accessed and mutated like any other ref, except that it acts as a two-way binding between a parent value and a local one:
-- Its `.value` is synced with the value bound by the parent `v-model`;
-- When it is mutated by the child, it causes the parent bound value to be updated as well.
-
-This means you can also bind this ref to a native input element with `v-model`, making it straightforward to wrap native input elements while providing the same `v-model` usage:
-```
-<script setup>
-const model = defineModel()
-</script>
-
-<template>
-  <input v-model="model" />
-</template>
+<MyButton class="large" />
 ```
 
-<h3>Under the Hood</h3>
-
-`defineModel` is a convenience macro. The compiler expands it to the following:
-- A prop named `modelValue`, which the local ref's value is synced with;
-- An event named `update:modelValue`, which is emitted when the local ref's value is mutated.
-
-This is how you would implement the same child component shown above prior to 3.4:
+The final rendered DOM would be:
 ```
-<!-- Child.vue -->
-<script setup>
-const props = defineProps(['modelValue'])
-const emit = defineEmits(['update:modelValue'])
-</script>
-
-<template>
-  <input
-    :value="modelValue"
-    @input="emit('update:modelValue', $event.target.value)"
-  />
-</template>
+<button class="large">Click Me</button>
 ```
 
-Then, `v-model="foo"` in the parent component will be compiled to:
-```
-<!-- Parent.vue -->
-<Child
-  :modelValue="foo"
-  @update:modelValue="$event => (foo = $event)"
-/>
-```
+Here, `<MyButton>` did not declare `class` as an accepted prop. Therefore, `class` is treated as a fallthrough attribute and automatically added to `<MyButton>`'s root element.
 
-As you can see, it is quite a bit more verbose. However, it is helpful to understand what is happening under the hood.
+<br><br><h3>
 
-Because `defineModel` declares a prop, you can therefore declare the underlying prop's options by passing it to `defineModel`:
-```
-// making the v-model required
-const model = defineModel({ required: true })
-
-// providing a default value
-const model = defineModel({ default: 0 })
-```
-
-Warning: If you have a `default` value for `defineModel` prop and you don't provide any value for this prop from the parent component, it can cause a de-synchronization between parent and child components. In the example below, the parent's `myRef` is undefined, but the child's `model` is 1:
-```
-// child component:
-const model = defineModel({ default: 1 })
-
-// parent component:
-const myRef = ref()
-```
-```
-<Child v-model="myRef"></Child>
-```
-
-<h3>
-
-`v-model` arguments
+`class` and `style` Merging
 
 </h3>
 
-`v-model` on a component can also accept an argument:
+If the child component's root element already has existing `class` or `style` attributes, it will be merged with the `class` and `style` values that are inherited from the parent.
+Suppose we change the template of `<MyButton>` in the previous example to:
 ```
-<MyComponent v-model:title="bookTitle" />
-```
-
-In the child component, we can support the corresponding argument by passing a string to `defineModel()` as its first argument:
-```
-<!-- MyComponent.vue -->
-<script setup>
-const title = defineModel('title')
-</script>
-
-<template>
-  <input type="text" v-model="title" />
-</template>
+<!-- template of <MyButton> -->
+<button class="btn">Click Me</button>
 ```
 
-If prop options are also needed, they should be passed after the model name:
+Then the final rendered DOM would now become:
 ```
-const title = defineModel('title', { required: true })
+<button class="btn large">Click Me</button>
 ```
 
-<h3>
+<br><br><h3>
 
-Multiple `v-model` bindings
+`v-on` Listener Inheritance
 
 </h3>
 
-By leveraging the ability to target a particular prop and event as we learned before with `v-model` arguments, we can now create multiple `v-model` bindings on a single component instance.
-
-Each `v-model` will sync to a different prop, without the need for extra options in the component:
+The same rule applies to `v-on` event listeners:
 ```
-<UserName
-  v-model:first-name="first"
-  v-model:last-name="last"
-/>
-```
-```
-<script setup>
-const firstName = defineModel('firstName')
-const lastName = defineModel('lastName')
-</script>
-
-<template>
-  <input type="text" v-model="firstName" />
-  <input type="text" v-model="lastName" />
-</template>
+<MyButton @click="onClick" />
 ```
 
-<h3>
+The `click` listener will be added to the root element of `<MyButton>`, i.e. the native `<button>` element. When the native `<button>` is clicked, it will trigger the `onClick` method of the parent component. If the native `<button>` already has a `click` listener bound with `v-on`, then both listeners will trigger.
 
-Handling `v-model` modifiers
+<br><br><h3>Nested Component Inheritance</h3>
 
-</h3>
-
-When we were learning about form input bindings, we saw that `v-model` has built-in modifiers - `.trim`, `.number` and `.lazy`. In some cases, you might also want the `v-model` on your custom input component to support custom modifiers.
-
-Let's create an example custom modifier, `capitalize`, that capitalizes the first letter of the string provided by the `v-model` binding:
+If a component renders another component as its root node, for example, we factored `<MyButton>` to render a `<BaseButton>` as its root:
 ```
-<MyComponent v-model.capitalize="myText" />
+<!-- template of <MyButton/> that simply renders another component -->
+<BaseButton />
 ```
 
-Modifiers added to a component `v-model` can be accessed in the child component by destructuring the `defineModel()` return value like this:
+Then the fallthrough attributes received by `<MyButton>` will be automatically forwarded to `<BaseButton>`
+
+Note that:
+1. Forwarded attributes do not include any attributes that are declared as props, or `v-on` listeners of declared events by `<MyButton>` - in other words, the declared props and listeners have been "consumed" by `<MyButton>`.
+
+2. Forwarded attributes may be accepted as props by `<BaseButton>`, if declared by it.
+
+<br><br><h3>Disabling Attribute Inheritance</h3>
+
+If you don't want a component to automatically inherit attributes, you can set `inheritAttrs: false` in the component's options.
+
+Since 3.3 you can also use `defineOptions` directly in `<script setup>`:
 ```
 <script setup>
-const [model, modifiers] = defineModel()
-
-console.log(modifiers) // { capitalize: true }
-</script>
-
-<template>
-  <input type="text" v-model="model" />
-</template>
-```
-
-To conditionally adjust how the value should be read / written based on modifiers, we can pass `get` and `set` options to `defineModel()`. These two options receive the value on get / set of the model ref and should return a transformed value. This is how we can use the `set` option to implement the `capitalize` modifier:
-```
-<script setup>
-const [model, modifiers] = defineModel({
-  set(value) {
-    if (modifiers.capitalize) {
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
-    return value
-  }
+defineOptions({
+  inheritAttrs: false
 })
+// ...setup logic
 </script>
-
-<template>
-  <input type="text" v-model="model" />
-</template>
 ```
 
-<h3>
+The common scenario for disabling attribute inheritance is when attributes need to be applied to other elements besides the root node. By setting the `inheritAttrs` option to `false`, you can take full control over where the fallthrough attributes should be applied.
 
-Modifiers for `v-model` with arguments
-
-</h3>
-
-Here's another example of using modifiers with multiple `v-model` with different arguments:
+These fallthrough attributes can be accessed directly in template expressions as `$attrs`:
 ```
-<UserName
-  v-model:first-name.capitalize="first"
-  v-model:last-name.uppercase="last"
-/>
+<span>Fallthrough attributes: {{ $attrs }}</span>
 ```
+
+The `$attrs` object includes all attributes that are not declared by the component's `props` or `emits` options (e.g., `class`, `style`, `v-on` listeners, etc.).
+
+Some notes:
+- Unlike props, fallthrough attributes preserve their original casing in JavaScript, so an attribute like `foo-bar` needs to be accessed as `$attrs['foo-bar']`.
+
+- A `v-on` event listener like `@click` will be exposed on the object as a function under `$attrs.onClick`.
+
+Using our `<MyButton>` component example from the previous section - sometimes we may need to wrap the actual `<button>` element with an extra `<div>` for styling purposes:
+```
+<div class="btn-wrapper">
+  <button class="btn">Click Me</button>
+</div>
+```
+
+We want all fallthrough attributes like `class` and `v-on` listeners to be applied to the inner `<button>`, not the outer `<div>`. We can achieve this with `inheritAttrs: false` and `v-bind="$attrs"`:
+```
+<div class="btn-wrapper">
+  <button class="btn" v-bind="$attrs">Click Me</button>
+</div>
+```
+
+Remember that `v-bind` without an argument binds all the properties of an object as attributes of the target element.
+
+
+<br><br><h3>Attribute Inheritance on Multiple Root Nodes</h3>
+
+Unlike components with a single root node, components with multiple root nodes do not have an automatic attribute fallthrough behavior. If `$attrs` are not bound explicitly, a runtime warning will be issued.
+```
+<CustomLayout id="custom-layout" @click="changeValue" />
+```
+
+If `<CustomLayout>` has the following multi-root template, there will be a warning because Vue cannot be sure where to apply the fallthrough attributes:
+```
+<header>...</header>
+<main>...</main>
+<footer>...</footer>
+```
+
+The warning will be suppressed if `$attrs` is explicitly bound:
+```
+<header>...</header>
+<main v-bind="$attrs">...</main>
+<footer>...</footer>
+```
+
+<br><br><h3>Accessing Falthrough Attributes in JavaScript</h3>
+
+If needed, you can access a component's fallthrough attributes in `<script setup>` using the `useAttrs()` API:
 ```
 <script setup>
-const [firstName, firstNameModifiers] = defineModel('firstName')
-const [lastName, lastNameModifiers] = defineModel('lastName')
+import { useAttrs } from 'vue'
 
-console.log(firstNameModifiers) // { capitalize: true }
-console.log(lastNameModifiers) // { uppercase: true }
+const attrs = useAttrs()
 </script>
 ```
+
+If not using `<script setup>`, `attrs` will be exposed as a property of `setup()` context:
+```
+export default {
+  setup(props, ctx) {
+    // fallthrough attributes are exposed as ctx.attrs
+    console.log(ctx.attrs)
+  }
+}
+```
+
+Note that although the `attrs` object here always reflects the latest fallthrough attributes, it isn't reactive (for performance reasons). You cannot use watchers to observe its changes. If you need reactivity, use a prop. Alternatively, you can use `onUpdated()` to perform side effects with the latest `attrs` on each update.
