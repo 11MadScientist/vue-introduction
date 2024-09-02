@@ -39,7 +39,7 @@
 
 <script setup>
 import {ref} from 'vue';
-import Component1 from './components/icons/Component1.vue';
+import Component1 from './components/Component1.vue';
 
 const childMsg = ref(null);
 
